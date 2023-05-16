@@ -26,11 +26,11 @@ $Templates = Get-ChildItem "Config\*.CATemplate.json" | ForEach-Object {
 #List new policies
 $Table = Get-CippTable -tablename 'templates'
 $Filter = "PartitionKey eq 'CATemplate'" 
-$Templates = (Get-AzDataTableRow @Table -Filter $Filter) | ForEach-Object {
+$Templates = (Get-AzDataTableEntity @Table -Filter $Filter) | ForEach-Object {
     $data = $_.JSON | ConvertFrom-Json 
     $data | Add-Member -NotePropertyName "GUID" -NotePropertyValue $_.GUID
     $data 
-}
+} | Sort-Object -Property displayName
 
 if ($Request.query.ID) { $Templates = $Templates | Where-Object -Property GUID -EQ $Request.query.id }
 

@@ -16,21 +16,26 @@ $Results = foreach ($Tenant in $tenants) {
             'AllTenants'
         }
         $CompleteObject = @{
-            tenant          = $tenant
-            tenantid        = $TenantID 
-            AdminPassword   = [bool]$Request.body.AdminPassword
-            DefenderMalware = [bool]$Request.body.DefenderMalware
-            DefenderStatus  = [bool]$Request.body.DefenderStatus
-            MFAAdmins       = [bool]$Request.body.MFAAdmins
-            MFAAlertUsers   = [bool]$Request.body.MFAAlertUsers
-            NewGA           = [bool]$Request.body.NewGA
-            NewRole         = [bool]$Request.body.NewRole
-            QuotaUsed       = [bool]$Request.body.QuotaUsed
-            UnusedLicenses  = [bool]$Request.body.UnusedLicenses
-            AppSecretExpiry = [bool]$Request.body.AppSecretExpiry
-            type            = 'Alert'
-            RowKey          = $TenantID 
-            PartitionKey    = 'Alert'
+            tenant           = $tenant
+            tenantid         = $TenantID 
+            AdminPassword    = [bool]$Request.body.AdminPassword
+            DefenderMalware  = [bool]$Request.body.DefenderMalware
+            DefenderStatus   = [bool]$Request.body.DefenderStatus
+            MFAAdmins        = [bool]$Request.body.MFAAdmins
+            MFAAlertUsers    = [bool]$Request.body.MFAAlertUsers
+            NewGA            = [bool]$Request.body.NewGA
+            NewRole          = [bool]$Request.body.NewRole
+            QuotaUsed        = [bool]$Request.body.QuotaUsed
+            UnusedLicenses   = [bool]$Request.body.UnusedLicenses
+            OverusedLicenses = [bool]$Request.body.OverusedLicenses
+            AppSecretExpiry  = [bool]$Request.body.AppSecretExpiry
+            ApnCertExpiry    = [bool]$Request.body.ApnCertExpiry
+            VppTokenExpiry   = [bool]$Request.body.VppTokenExpiry
+            DepTokenExpiry   = [bool]$Request.body.DepTokenExpiry
+            NoCAConfig       = [bool]$Request.body.NoCAConfig
+            type             = 'Alert'
+            RowKey           = $TenantID 
+            PartitionKey     = 'Alert'
         }
 
         $Table = get-cipptable -TableName 'SchedulerConfig'
@@ -39,12 +44,11 @@ $Results = foreach ($Tenant in $tenants) {
             property       = $CompleteObject
             UpdateExisting = $true
         }#>
-        Write-Host ($TableRow | ConvertTo-Json)
 
         #Add-AzTableRow @TableRow | Out-Null
         Add-AzDataTableEntity @Table -Entity $CompleteObject -Force
-        "Succesfully added Alert for $($Tenant) to queue."
-        Write-LogMessage -user $request.headers.'x-ms-client-principal' -API $APINAME -tenant $tenant -message "Succesfully added Alert for $($Tenant) to queue." -Sev 'Info'
+        "Successfully added Alert for $($Tenant) to queue."
+        Write-LogMessage -user $request.headers.'x-ms-client-principal' -API $APINAME -tenant $tenant -message "Successfully added Alert for $($Tenant) to queue." -Sev 'Info'
     }
     catch {
         Write-LogMessage -user $request.headers.'x-ms-client-principal' -API $APINAME -tenant $tenant -message "Failed to add Alert for for $($Tenant) to queue" -Sev 'Error'
